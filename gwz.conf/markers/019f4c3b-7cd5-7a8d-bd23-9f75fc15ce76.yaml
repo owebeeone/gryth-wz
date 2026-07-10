@@ -1,0 +1,44 @@
+schema: gwz.marker/v0
+gwz_commit_id: 019f4c3b-7cd5-7a8d-bd23-9f75fc15ce76
+workspace_id: ws_default
+created_at: unix-ms:1783690394841
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  branch: main
+selected_targets:
+- '@root'
+- mem_gryth_ui
+- mem_grip_core
+- mem_grip_react
+committed_targets:
+- '@root'
+members:
+  mem_grip_core:
+    path: grip-core
+    source_id: src_grip_core
+    source_kind: git
+    commit: 97ff6c26f12e2808cd794d2947a852d7c16e4e22
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_grip_react:
+    path: grip-react
+    source_id: src_grip_react
+    source_kind: git
+    commit: 8b17279dbef35f7c82fb298ce72a5929ea9921d4
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gryth_ui:
+    path: gryth-ui
+    source_id: src_gryth_ui
+    source_kind: git
+    commit: 5ee4d0669c823bce86c417d330306205413d9c70
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
