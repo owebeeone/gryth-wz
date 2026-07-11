@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gryth-ui",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "gryth-ui", "run", "dev", "--port", "5273", "--strictPort"],
+      "port": 5273,
+      "autoPort": false
+    }
+  ]
+}

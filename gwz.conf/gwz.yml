@@ -38,3 +38,15 @@ members:
     url: git@github.com:owebeeone/grip-react.git
     fetch: true
     push: true
+- id: mem_glade_decl_ts
+  path: glade-decl-ts
+  type: git
+  source_id: src_glade_decl_ts
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/glade-decl-ts.git
+    fetch: true
+    push: true
