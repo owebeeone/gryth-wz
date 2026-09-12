@@ -50,3 +50,15 @@ members:
     url: git@github.com:owebeeone/glade-decl-ts.git
     fetch: true
     push: true
+- id: mem_glial
+  path: glial
+  type: git
+  source_id: src_glial
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/glial-runtime.git
+    fetch: true
+    push: true
