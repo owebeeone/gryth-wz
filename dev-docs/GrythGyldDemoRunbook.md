@@ -172,12 +172,31 @@ Open `+ Gyld streams` from the launcher and press `Add glade node`.
    does not depend on the root: it is the glade session, so a static root
    submits exactly as a glade root does.
 
+   FRESH desk is literal: the picker is what a Gyld window draws while the desk
+   holds no root at all, and there is no other place to add or drop one, so a
+   desk already on the glade node shows no picker and neither does a second
+   desktop or another workspace, which share the same root set. Reload the page
+   to get the picker back. Every later build is added the same way, by reload.
+
    Then choose the question, an alternative, a principal, a stamp and the
    ruling text. `Export overlay` puts the module in the box and `Submit answer`
    sends that very text. The composed module carries the stream's
    `gyld-stream-record:` block, and for a FORK it declares `follows: base` and
    `imports: glade_decisions`, which is what the module actually imports and
    what its root subclasses.
+
+   `demo-keys` is a fork of `stream-a`, so its own module restates that
+   stream's records, and `Submit answer` is refused there, naming the module
+   and the six records it already declares. That is the guard under "One
+   answer per stream" below doing its job, and the way past it is the flow
+   that guard names: make the stream this ruling belongs to. In
+   `+ Gyld streams` choose `Link`, parent `demo-keys`, name
+   `demo-keys-ruling`, `Submit`, `Rebuild`; add THAT build as a static root
+   and press `Decide` on the new stream. Its module declares nothing but its
+   own root class, which the composed module declares again, so `Submit
+   answer` is live: the run streams `end, exit 0`, the supplier writes the
+   module and rebuilds, and in the new build `demo-keys-ruling` validates
+   `ok` with `key_custody` reading `Decided`.
 6. **Diff.** Open `+ Gyld diff`, add the same static root, choose left `base`
    and right `demo-keys`. The pair is not in the bundle, so the window says so,
    prints the command that writes it, and offers `Request this diff`. Pressing
@@ -211,7 +230,21 @@ fork `demo-keys` went from 25 questions and 3 rulings to 24 and 1. The window
 now refuses a submit where the stream's own module already declares records,
 naming the module and the count, and Export is untouched because merging by
 hand is what it is for. So the flow is one fork or link per ruling, which is
-what specification section 6.1 describes anyway.
+what specification section 6.1 describes anyway, and it is the path that
+submits: link (or fork) the stream FOR this ruling, rebuild, read the new build
+as a static root, and answer there.
+
+The records counted are the ones the module places under its root,
+`<module>:<Root>.<member>`. The ROOT CLASS does not count: its slot is
+`<module>:<Root>` with no member, every generated overlay declares it, and the
+composed module declares it again under the name the stream record registers,
+so nothing is lost by rewriting it. The first cut of the guard counted it, and
+because a fresh link declares exactly that one class it refused every fork and
+every link with "already declares 1 record" - the advice and the guard closed
+on each other and no stream could be answered at all. A re-run on 2026-09-14
+found that; the guard now counts members only, and refuses separately, naming
+both, when the root class the module declares is not the root the stream
+registered.
 
 **No projection on a glade root.** Two files of a bundle are on no share,
 `projection.json` and `validation.json`, and neither is an emitted diff. The
