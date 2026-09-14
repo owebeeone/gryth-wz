@@ -255,31 +255,13 @@ there with nothing pressed and there is no picker to get past
 4. **Draw it.** Open `+ Gyld browser`, choose stream `demo-keys` and
    perspective `decisions`. The picture draws from a lens pointer fetched over
    the proxy with its sha256 checked.
-5. **Answer.** Press `Decide`. On a GLADE root both forms refuse with
-   `this stream carries no projection here`, because the supplier publishes
-   `stream.json`, `decide-now.json` and the lens pointers and NOT
-   `projection.json`, and the classes an overlay names are declared in the
-   projection. That refusal is the second surprise and it is honest.
+5. **Answer.** Press `Decide`. It composes on a GLADE root: the supplier
+   publishes each stream's `projection.json` and `validation.json` on
+   `gyld.file` as pointers beside the lens pointers, so the classes an overlay
+   names are read the same way the picture is. The static-root detour this step
+   used to require is gone.
 
-   To answer, read the build as a static root instead. The build directory is
-   under grazel's static path, so in the set picker of a fresh desk type
-
-   ```
-   /gyld/builds/build-1789341052425
-   ```
-
-   (whatever `latest.json` names), press `Add static root`, and the same
-   windows read the whole build, projection and validation included. `Gyld.Ops`
-   does not depend on the root: it is the glade session, so a static root
-   submits exactly as a glade root does.
-
-   FRESH desk is literal: the picker is what a Gyld window draws while the desk
-   holds no root at all, and there is no other place to add or drop one, so a
-   desk already on the glade node shows no picker and neither does a second
-   desktop or another workspace, which share the same root set. Reload the page
-   to get the picker back. Every later build is added the same way, by reload.
-
-   Then choose the question, an alternative, a principal, a stamp and the
+   Choose the question, an alternative, a principal, a stamp and the
    ruling text. `Export overlay` puts the module in the box and `Submit answer`
    sends that very text. The composed module carries the stream's
    `gyld-stream-record:` block, and for a FORK it declares `follows: base` and
@@ -292,14 +274,16 @@ there with nothing pressed and there is no picker to get past
    answer per stream" below doing its job, and the way past it is the flow
    that guard names: make the stream this ruling belongs to. In
    `+ Gyld streams` choose `Link`, parent `demo-keys`, name
-   `demo-keys-ruling`, `Submit`, `Rebuild`; add THAT build as a static root
-   and press `Decide` on the new stream. Its module declares nothing but its
+   `demo-keys-ruling`, `Submit`, `Rebuild`; press `Decide` on the new
+   stream. Its module declares nothing but its
    own root class, which the composed module declares again, so `Submit
    answer` is live: the run streams `end, exit 0`, the supplier writes the
    module and rebuilds, and in the new build `demo-keys-ruling` validates
    `ok` with `key_custody` reading `Decided`.
-6. **Diff.** Open `+ Gyld diff`, add the same static root, choose left `base`
-   and right `demo-keys`. The pair is not in the bundle, so the window says so,
+6. **Diff.** Open `+ Gyld diff`, choose left `base` and right `demo-keys`. An
+   emitted diff is the one bundle file still on no share, so add the build as a
+   static root (type `/gyld/builds/<build>` in the set picker of a fresh desk)
+   to read one that already exists. The pair is not in the bundle, so the window says so,
    prints the command that writes it, and offers `Request this diff`. Pressing
    it runs the supplier's `diff`, which writes into that bundle's own `diffs/`,
    and the window's watch loop picks the file up and renders it in place.
@@ -332,8 +316,7 @@ now refuses a submit where the stream's own module already declares records,
 naming the module and the count, and Export is untouched because merging by
 hand is what it is for. So the flow is one fork or link per ruling, which is
 what specification section 6.1 describes anyway, and it is the path that
-submits: link (or fork) the stream FOR this ruling, rebuild, read the new build
-as a static root, and answer there.
+submits: link (or fork) the stream FOR this ruling, rebuild, and answer there.
 
 The records counted are the ones the module places under its root,
 `<module>:<Root>.<member>`. The ROOT CLASS does not count: its slot is
@@ -347,20 +330,22 @@ found that; the guard now counts members only, and refuses separately, naming
 both, when the root class the module declares is not the root the stream
 registered.
 
-**No projection on a glade root.** Two files of a bundle are on no share,
-`projection.json` and `validation.json`, and neither is an emitted diff. The
-decide window needs the projection, so it composes nothing on a glade root and
-says so. Reading the build as a static root is the answer, and that is what
-step 5 does.
+**No projection on a glade root.** Fixed on 2026-09-14. `projection.json` and
+`validation.json` were on no share, so the decide window composed nothing on a
+glade root, validation read as absent, and every record window said the stream
+carried no such record when the truth was that no record was readable at all.
+They now travel on `gyld.file` as pointers, like the lenses. An emitted diff is
+still on no share.
 
 **A streaming answer names no build.** `stream_output: true` is answered with
 `{ok, run_id, done: false}` and the build directory is only on a synchronous
 answer, which every building verb avoids because a build is minutes of Python.
 The `end` record on the log carries the exit code and not the directory either.
 So the supplier panel's offer to read the build it just made never appears for
-a verb that builds, and a static root has to be pointed at the new build by
-hand. Putting `output_dir` on the log's `end` record, or publishing the build
-on a value share of its own, would fix it and is a `glade-gyld` change.
+a verb that builds. It matters far less now that the records travel on
+`gyld.file` — a glade root follows each new build on its own — and still costs
+a hand-pointed static root for an emitted diff. Putting `output_dir` on the
+log's `end` record would fix that and is a `glade-gyld` change.
 
 ## Stopping
 
