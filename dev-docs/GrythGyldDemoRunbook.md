@@ -17,7 +17,7 @@ you would first expect and the one that lost data before it was fixed.
 | `grazel` | `http://127.0.0.1:8080` | the composition root: node, suppliers, static paths |
 | `glade-gyld` | behind `(ws-razel, gyld.ops)` | the Gyld verbs, run as subprocesses of the Gyld hosts |
 | `glade-gwz` | behind `(ws-razel, gwz.ops)` | the sibling supplier, spawned by the same grazel |
-| `pnpm dev` | `http://localhost:5173` | the desktop; no `/bootstrap.json`, so it falls back to the node above |
+| `pnpm dev:gyld` | `http://localhost:5173` | the Gyld-only desktop; no `/bootstrap.json`, so it falls back to the node above |
 | the bundle root | `<data>/files/gyld` | app owned, the supplier's outright; grazel serves it at `/gyld/` |
 | the Gyld checkout | `gyld-wz/gyld` | READ ONLY: the hosts are run out of it and nothing is written back |
 
@@ -118,20 +118,51 @@ not made here.
 
 ```sh
 cd /Users/owebeeone/limbo/gryth-wz/gryth-ui
-pnpm dev
+pnpm dev:gyld
 ```
 
-`http://localhost:5173`. There is no `/bootstrap.json` in front of the page, so
-`@grythjs/glade` falls back to `ws://127.0.0.1:9099`, which is the node grazel
-started. The dev server proxies `/gyld/` to grazel (`GRAZEL_URL`, default
-`http://127.0.0.1:8080`), which is what makes a lens pointer resolve: a
-`gyld.lens` value is a `{path, digest, bytes}` pointer whose `path` is
-grazel's, and without the proxy a glade root lists streams and draws nothing.
-The proxy key is a regex, so `/gyld-bundle/` and `/gyld-evaluator/`, which are
-the dev server's own mounts over the Gyld artifacts directory, are untouched.
+`http://localhost:5173`. `dev:gyld` is the GYLD-ONLY target (`entries/gyld`,
+`vite.gyld.config.ts`): the same desktop whose whole plugin list is
+`@grythjs/plugin-gyld`, so the launcher offers the seven Gyld windows and
+`+ Welcome` and nothing unrelated. `pnpm dev` is the full desktop and drives
+this runbook identically; the two differ only in their plugin list.
 
-Serving the built application from grazel itself (`--ui dist`) needs no proxy,
-because then the page and the bundle root are one origin.
+There is no `/bootstrap.json` in front of the page, so `@grythjs/glade` falls
+back to `ws://127.0.0.1:9099`, which is the node grazel started. The dev server
+proxies `/gyld/` to grazel (`GRAZEL_URL`, default `http://127.0.0.1:8080`),
+which is what makes a lens pointer resolve: a `gyld.lens` value is a
+`{path, digest, bytes}` pointer whose `path` is grazel's, and without the proxy
+a glade root lists streams and draws nothing. The proxy key is a regex, so
+`/gyld-bundle/` and `/gyld-evaluator/`, which are the dev server's own mounts
+over the Gyld artifacts directory, are untouched.
+
+### Or: let grazel serve the desktop, and have no proxy at all
+
+Build the target and hand the directory to grazel in step 1, and the page and
+the bundle root are one origin:
+
+```sh
+cd /Users/owebeeone/limbo/gryth-wz/gryth-ui
+pnpm build:gyld                                    # -> dist-gyld/
+```
+
+then add to the grazel command of step 1
+
+```
+  --ui /Users/owebeeone/limbo/gryth-wz/gryth-ui/dist-gyld
+```
+
+and open `http://127.0.0.1:8080/` instead. No `pnpm dev` runs at all; the lens
+is fetched from `/gyld/...` on the page's own origin. Driven on 2026-09-14
+exactly this way: fresh `/tmp/gyld-demo-data`, `List` refused on the empty
+root, seeded per step 2, `List` accepted, `Rebuild` streamed to `end, exit 0`,
+`glade node: ready - watching` with 5 streams in the stream manager, and stream
+`base` perspective `decisions` drawn in the browser from
+`/gyld/builds/<build>/streams/base/lenses/decisions.lens.json`. The full
+desktop does the same with `pnpm build` and `--ui dist`.
+
+Remember to rebuild the directory after a UI change: grazel serves the bytes in
+it and knows nothing about the source.
 
 ## 4. Drive it
 
@@ -265,7 +296,7 @@ on a value share of its own, would fix it and is a `glade-gyld` change.
 
 ```sh
 pkill -f 'target/debug/grazel'     # tears the node and both suppliers down with it
-pkill -f 'vite'                    # or Ctrl-C in the pnpm dev terminal
+pkill -f 'vite'                    # or Ctrl-C in the pnpm dev / dev:gyld terminal
 rm -rf /tmp/gyld-demo-data         # the builds are large and disposable
 ```
 
