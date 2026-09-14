@@ -9,6 +9,43 @@ Written from a run that actually did it on 2026-09-14. Everything below is what
 was typed and what came back, including the two things that do not work the way
 you would first expect and the one that lost data before it was fixed.
 
+## Start it with the script
+
+```sh
+cd /Users/owebeeone/limbo/gryth-wz/gryth-ui
+python3 gyld-ui.py start
+```
+
+That is sections 1 to 3 below, done and checked, ending on the line
+
+```
+URL: http://localhost:5173/
+```
+
+and step 4 can begin at `Add glade node` — **`List` is accepted the first time
+it is pressed**, because the script lays the bundle root and gives it its first
+build itself. The "press `List` first" ordering under section 2 is a property of
+the hand-driven path only.
+
+```sh
+python3 gyld-ui.py status                # ok/FAIL per check, then working / not working
+python3 gyld-ui.py start --port 5180     # a second composition, its own ports and data
+python3 gyld-ui.py restart
+python3 gyld-ui.py stop [--purge]        # no --port: every instance
+```
+
+`start` is idempotent; `--mode built` is the no-proxy variant of section 3;
+`--http` and `--node-port` derive from `--port` (5173 → 8080/9099, the ports
+printed throughout this document) so two compositions never collide. An
+instance's data lives in `~/.gyld-ui/instances/<port>/` and is KEPT across a
+stop, because a ruling submitted from a window is written into the bundle root
+there; `stop --purge` is what deletes it. The option surface is in
+`gryth-ui/README.md`, "Running the Gyld composition".
+
+**The rest of this document is what the script does, and why.** Read it to
+drive a piece of the composition by hand, to understand what a check is
+checking, or to find out what a refusal means.
+
 ## What talks to what
 
 | piece | where | what it is |
@@ -17,7 +54,8 @@ you would first expect and the one that lost data before it was fixed.
 | `grazel` | `http://127.0.0.1:8080` | the composition root: node, suppliers, static paths |
 | `glade-gyld` | behind `(ws-razel, gyld.ops)` | the Gyld verbs, run as subprocesses of the Gyld hosts |
 | `glade-gwz` | behind `(ws-razel, gwz.ops)` | the sibling supplier, spawned by the same grazel |
-| `pnpm dev:gyld` | `http://localhost:5173` | the Gyld-only desktop; no `/bootstrap.json`, so it falls back to the node above |
+| `pnpm dev:gyld` | `http://localhost:5173` | the Gyld-only desktop; proxies `/gyld/` and `/bootstrap.json` to grazel |
+| `gyld-ui.py` | `gryth-ui/gyld-ui.py` | starts, checks and stops all of the above as one instance |
 | the bundle root | `<data>/files/gyld` | app owned, the supplier's outright; grazel serves it at `/gyld/` |
 | the Gyld checkout | `gyld-wz/gyld` | READ ONLY: the hosts are run out of it and nothing is written back |
 
@@ -41,6 +79,11 @@ df -h /System/Volumes/Data      # stop if less than 5 GiB is free
 The Gyld hosts need Python 3.13; the system `python3` is 3.10 and they fail on
 it. The supplier defaults to `/opt/homebrew/bin/python3.13` and takes
 `--python` if yours is elsewhere.
+
+`gyld-ui.py start` checks every one of these before it starts anything — the
+three binaries, `pnpm`, `node_modules`, the 3.13, the Gyld checkout and the
+5 GiB floor — and prints the fix beside whichever one is not there. It builds
+none of them: a missing binary is still `cargo build` in that member, by hand.
 
 ## 1. Start grazel, with the gyld leg on
 
@@ -103,16 +146,34 @@ PYTHONPATH=src:. /opt/homebrew/bin/python3.13 -B scripts/emit_decision_streams.p
 printf '{"output_dir":"builds/build-seed"}' > $BR/latest.json
 ```
 
-`$BR` does not exist until the supplier has been asked for something once, so
-press `List` in the UI first (step 4) or run the demo in this order: start
-grazel, open the desk, add the glade root, press `List`, watch it refuse, then
-seed. `$BR/stage/examples` is a symlink to `$BR/overlays`, which the supplier
-seeds from the read-only checkout's `examples/`, so the seed build captures the
+`$BR` does not exist until the supplier has been asked for something once, so on
+THIS path press `List` in the UI first (step 4) or run the demo in this order:
+start grazel, open the desk, add the glade root, press `List`, watch it refuse,
+then seed. Run it before the root is laid and you get the failure that named it:
+
+```
+No such file or directory: .../stage/examples/glade-decisions.gyld.py
+```
+
+`$BR/stage/examples` is a symlink to `$BR/overlays`, which the supplier seeds
+from the read-only checkout's `examples/`, so the seed build captures the
 committed streams and nothing else.
 
+`gyld-ui.py start` does not have this ordering problem: it lays the bundle root
+itself, with a mirror of the supplier's own `ensure_stage`
+(`glade-gyld/src/bundle.rs`), and then seeds. The mirror is create-if-absent and
+idempotent, laying exactly the tree the supplier lays, so the supplier's own lazy
+pass afterwards finds nothing to do and a written overlay still wins.
+
+The script's seed also asks the checkout which streams it declares and passes
+each one to the host as `--stream`, the way `manage_decision_streams.py rebuild`
+does. The bare command above emits `base` and `architecture` only, two streams;
+with the declared streams it emits five, which is what the census reads after
+step 4's `Rebuild` either way.
+
 A supplier that bootstrapped its own first build, or a `rebuild` that accepted
-an empty root, would remove this step. That is a change in `glade-gyld` and is
-not made here.
+an empty root, would remove this step for the hand-driven path too. That is a
+change in `glade-gyld` and is not made here.
 
 ## 3. Start the desktop
 
@@ -127,14 +188,24 @@ pnpm dev:gyld
 `+ Welcome` and nothing unrelated. `pnpm dev` is the full desktop and drives
 this runbook identically; the two differ only in their plugin list.
 
-There is no `/bootstrap.json` in front of the page, so `@grythjs/glade` falls
-back to `ws://127.0.0.1:9099`, which is the node grazel started. The dev server
-proxies `/gyld/` to grazel (`GRAZEL_URL`, default `http://127.0.0.1:8080`),
-which is what makes a lens pointer resolve: a `gyld.lens` value is a
+The dev server proxies TWO of grazel's paths onto its own origin, both at
+`GRAZEL_URL` (default `http://127.0.0.1:8080`).
+
+`/gyld/` is what makes a lens pointer resolve: a `gyld.lens` value is a
 `{path, digest, bytes}` pointer whose `path` is grazel's, and without the proxy
-a glade root lists streams and draws nothing. The proxy key is a regex, so
+a glade root lists streams and draws nothing. That proxy key is a regex, so
 `/gyld-bundle/` and `/gyld-evaluator/`, which are the dev server's own mounts
 over the Gyld artifacts directory, are untouched.
+
+`/bootstrap.json` is grazel's session placement, and it is what tells the page
+which node to attach to. It was NOT proxied until 2026-09-14, so the page fell
+back to `ws://127.0.0.1:9099` — which happened to be right for one composition
+on the default ports, and wrong for any second one: its desk would have attached
+to the FIRST composition's node. Proxied, `gyld-ui.py start --port 5180` gives a
+page that opens `ws://127.0.0.1:9106`, its own node, which is how that was
+checked. With no grazel behind the proxy the fetch does not answer `ok` and the
+`ws://127.0.0.1:9099` fallback applies exactly as before, with the proxy error
+in the browser console.
 
 ### Or: let grazel serve the desktop, and have no proxy at all
 
@@ -163,6 +234,10 @@ desktop does the same with `pnpm build` and `--ui dist`.
 
 Remember to rebuild the directory after a UI change: grazel serves the bytes in
 it and knows nothing about the source.
+
+`gyld-ui.py start --mode built --port 8090` is this variant: `--port` is then
+grazel's own HTTP port, `dist-gyld` is built if it is not there (`--build`
+forces it), and no vite runs at all.
 
 ## 4. Drive it
 
@@ -295,6 +370,13 @@ on a value share of its own, would fix it and is a `glade-gyld` change.
 ## Stopping
 
 ```sh
+python3 gyld-ui.py stop            # this instance's two groups, then a check that they are gone
+python3 gyld-ui.py stop --purge    # and delete its data directory
+```
+
+By hand:
+
+```sh
 pkill -f 'target/debug/grazel'     # tears the node and both suppliers down with it
 pkill -f 'vite'                    # or Ctrl-C in the pnpm dev / dev:gyld terminal
 rm -rf /tmp/gyld-demo-data         # the builds are large and disposable
@@ -303,8 +385,25 @@ rm -rf /tmp/gyld-demo-data         # the builds are large and disposable
 A SIGINT or SIGTERM to grazel tears every child down; the node exiting takes
 grazel with it, nonzero, with the tail of the node's stderr.
 
+**The stale lock.** The node's `instance.lock`
+(`<data>/sys/sys/grazel/instance.lock`, glade/node `sysdir.rs`) is created
+O_EXCL and removed on drop, so a node that was killed rather than asked to stop
+leaves one behind and the next start refuses with
+
+```
+instance already locked: .../instance.lock
+```
+
+The file holds the writer's pid, which is what tells a stale lock from a live
+one. `gyld-ui.py` reads it: a dead pid is removed and the removal is printed, a
+live one is reported as the running node it is, and `stop` clears the lock its
+own SIGTERM left. By hand, check the pid with `ps -p` and delete the file only
+when it is gone.
+
 ## Where the pieces are written down
 
+- `gryth-wz/gryth-ui/gyld-ui.py` and `gryth-ui/README.md`, "Running the Gyld
+  composition", for the script that does all of the above.
 - `glade-wz/grazel/README.md`, "Composed suppliers" and "The gyld static path".
 - `glade-wz/glade-gyld/README.md`, "The bundle root", "The allow-list",
   "Long-op output" and "Results".
