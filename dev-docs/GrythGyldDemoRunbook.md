@@ -22,10 +22,11 @@ That is sections 1 to 3 below, done and checked, ending on the line
 URL: http://localhost:5173/
 ```
 
-and step 4 can begin at `Add glade node` — **`List` is accepted the first time
-it is pressed**, because the script lays the bundle root and gives it its first
-build itself. The "press `List` first" ordering under section 2 is a property of
-the hand-driven path only.
+and step 4 can begin straight away: the desk lands on the glade node by itself,
+and **`List` is accepted the first time it is pressed**, because the supplier
+gave the bundle root its first build before the script printed that URL. The
+script waits for the supplier's `published builds/… (N streams)` line and prints
+`first build running (run boot-1)` with the elapsed time while it waits.
 
 ```sh
 python3 gyld-ui.py status                # ok/FAIL per check, then working / not working
@@ -119,61 +120,49 @@ in the way.
 is written to by every build and nothing is ever built over an existing build,
 so it grows.
 
-## 2. Give the bundle root its first build
+## 2. The bundle root builds itself
 
-This step is NOT optional today, and it is the first surprise. The supplier's
-bundle root starts empty, and `list`, `rebuild`, `answer`, `ask` and `diff` all
-resolve the latest build first, so on a fresh root every one of them answers
+There is nothing to do here, and there is nothing to type. **The supplier owns
+the first build** (`glade-wz/glade-gyld/README.md`, "The first build is the
+supplier's own"): the moment it is serving it reads the bundle root, and
 
-```
-list: refused, attributed to <principal>
-no bundle has been built yet
-```
+- **on an empty root** — a fresh `--data` — it lays the stage and runs the first
+  build itself as run `boot-1`, while it goes on serving. Four of its lines say
+  so, in this order:
 
-which is correct and is not a fault. `fork` and `link` are the two that need no
-build, but they write an overlay module rather than a bundle, so they do not
-break the deadlock either: the stream manager's parent picker is filled from the
-census, and the census comes from a build.
+  ```
+  [gyld] glade-gyld: first build of .../files/gyld — the bundle root holds none (run boot-1)
+  [gyld] glade-gyld: serving; SIGTERM/SIGINT to stop
+  [gyld] glade-gyld: the checkout declares fork-a, stream-a, stream-b
+  [gyld] glade-gyld: published builds/build-1789366082551 (5 streams)
+  ```
 
-So make the first build with the Gyld host directly, into the layout the
-supplier documents, and point `latest.json` at it:
+  It asks the CHECKOUT which streams the staging repository declares, with the
+  checkout's own `capture_decision_stream.discover` — the one line
+  `manage_decision_streams.py rebuild` runs before it builds — so the first
+  build lists the five a `Rebuild` would and not the two a bare emit gives.
 
-```sh
-BR=/tmp/gyld-demo-data/files/gyld           # the bundle root
-cd /Users/owebeeone/limbo/gyld-wz/gyld
-PYTHONPATH=src:. /opt/homebrew/bin/python3.13 -B scripts/emit_decision_streams.py \
-  --repository $BR/stage --output $BR/builds/build-seed --architecture
-printf '{"output_dir":"builds/build-seed"}' > $BR/latest.json
-```
+- **on a root that already holds a build** — a second start of the same data
+  directory — it publishes that build the moment it attaches, and only the
+  `published` line follows `serving`.
 
-`$BR` does not exist until the supplier has been asked for something once, so on
-THIS path press `List` in the UI first (step 4) or run the demo in this order:
-start grazel, open the desk, add the glade root, press `List`, watch it refuse,
-then seed. Run it before the root is laid and you get the failure that named it:
+Until that publication lands, a verb that needs a bundle is refused with the run
+rather than with a flat denial:
 
 ```
-No such file or directory: .../stage/examples/glade-decisions.gyld.py
+the first build is in progress (run boot-1); nothing has landed yet
 ```
 
-`$BR/stage/examples` is a symlink to `$BR/overlays`, which the supplier seeds
-from the read-only checkout's `examples/`, so the seed build captures the
-committed streams and nothing else.
+`fork` and `link` are unaffected throughout: they write an overlay module rather
+than a bundle and never needed one.
 
-`gyld-ui.py start` does not have this ordering problem: it lays the bundle root
-itself, with a mirror of the supplier's own `ensure_stage`
-(`glade-gyld/src/bundle.rs`), and then seeds. The mirror is create-if-absent and
-idempotent, laying exactly the tree the supplier lays, so the supplier's own lazy
-pass afterwards finds nothing to do and a written overlay still wins.
-
-The script's seed also asks the checkout which streams it declares and passes
-each one to the host as `--stream`, the way `manage_decision_streams.py rebuild`
-does. The bare command above emits `base` and `architecture` only, two streams;
-with the declared streams it emits five, which is what the census reads after
-step 4's `Rebuild` either way.
-
-A supplier that bootstrapped its own first build, or a `rebuild` that accepted
-an empty root, would remove this step for the hand-driven path too. That is a
-change in `glade-gyld` and is not made here.
+The `published` line is the census reaching the value shares, which is what a
+desk reads. `gyld-ui.py start` waits for it — printing `first build running (run
+boot-1)` with the elapsed time meanwhile — and does not start the dev server or
+print the URL until it is there. So a page opened at that URL never lands on a
+root with nothing in it. `status` checks the same thing twice over: that
+`latest.json` names a build, and that the log carries the supplier's publication
+of THAT build.
 
 ## 3. Start the desktop
 
@@ -225,8 +214,9 @@ then add to the grazel command of step 1
 
 and open `http://127.0.0.1:8080/` instead. No `pnpm dev` runs at all; the lens
 is fetched from `/gyld/...` on the page's own origin. Driven on 2026-09-14
-exactly this way: fresh `/tmp/gyld-demo-data`, `List` refused on the empty
-root, seeded per step 2, `List` accepted, `Rebuild` streamed to `end, exit 0`,
+exactly this way, on a fresh `/tmp/gyld-demo-data` — back when the first build
+was still made by hand, so `List` was refused on the empty root and accepted
+once it was built. Then: `Rebuild` streamed to `end, exit 0`,
 `glade node: ready - watching` with 5 streams in the stream manager, and stream
 `base` perspective `decisions` drawn in the browser from
 `/gyld/builds/<build>/streams/base/lenses/decisions.lens.json`. The full
@@ -241,11 +231,16 @@ forces it), and no vite runs at all.
 
 ## 4. Drive it
 
-Open `+ Gyld streams` from the launcher and press `Add glade node`.
+Open `+ Gyld streams` from the launcher. The desk is already on the glade node:
+an empty desk adds that root itself on the edge into `live`, so the census is
+there with nothing pressed and there is no picker to get past
+(`gryth-ui/packages/plugins/gyld/README.md`, "What an empty desk lands on").
+`Add glade node` is still in the picker for a desk whose root was removed.
 
-1. **List.** Answers `list: refused ... no bundle has been built yet` on a
-   fresh root, and after step 2 answers `list: accepted, exit 0, run run-1`
-   with the build's whole `streams.json` in the panel. It runs no host.
+1. **List.** `list: accepted, exit 0, run run-1`, with the build's whole
+   `streams.json` in the panel. It runs no host. On a root whose first build is
+   still in flight it answers `the first build is in progress (run boot-1)`
+   instead, and `gyld-ui.py start` has already waited that out.
 2. **Rebuild.** A streaming run: the answer is `rebuild: accepted, run run-2`
    and the run's lines arrive on `gyld.output` keyed by that run, ending
    `end, exit 0`. When it lands, the census arrives on the shares and the
