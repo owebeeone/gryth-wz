@@ -304,6 +304,94 @@ there with nothing pressed and there is no picker to get past
    it runs the supplier's `diff`, which writes into that bundle's own `diffs/`,
    and the window's watch loop picks the file up and renders it in place.
 
+## Asking with a local model
+
+The ask agent talks to Anthropic's Messages API. It will talk to anything else
+that speaks it — the owner's `dabeest` box serves a patched Ollama on that API
+— and the switch is configuration, never a code path: the Anthropic default is
+untouched and stays the default.
+
+grazel composes the supplier's argv itself and passes **none** of its
+`--agent-*` flags, so a running desk cannot be configured with a flag. Two
+channels reach it, and `gyld-ui.py` serves both.
+
+**The file.** Under the instance's own bundle root, beside the key:
+
+```sh
+D=~/.gyld-ui/instances/5173/files/gyld/agent
+mkdir -p "$D"
+cat > "$D/config.json" <<'JSON'
+{ "base_url": "http://127.0.0.1:11434", "model": "qwen3.8-96k" }
+JSON
+printf 'ollama\n' > "$D/api-key"; chmod 600 "$D/api-key"
+```
+
+The key file is mode-checked and refused if any other account can read it. Its
+value is ignored by that server and must be there all the same. The `ollama`
+compatibility profile is detected from the base URL; `"compat": "ollama"` names
+it explicitly when you want it named. The supplier re-reads this file at every
+call, so a model changed here takes effect on the next question — a `restart`
+is only needed if the instance was not running.
+
+**The environment.** `start` and `restart` carry `ANTHROPIC_BASE_URL`,
+`GYLD_AGENT_MODEL`, `ANTHROPIC_AUTH_TOKEN` and `ANTHROPIC_API_KEY` through to
+grazel and say which they carried — the endpoint and the model by value, a key
+by name alone. The environment beats the file, so a shell that already exports
+`ANTHROPIC_BASE_URL` for something else will win: `env -u ANTHROPIC_BASE_URL
+python3 gyld-ui.py start` is how you let the file answer.
+
+Before any of it, the tunnel: `dabeest-tunnel up` is idempotent, and
+`curl -s http://127.0.0.1:11434/api/version` answers `0.33.0-dabeest`. The
+model tags are `qwen3.8-96k` (the daily driver, 96K, best quality) and
+`gemma4:26b` / `claude-dabeest-fast` (fast, 256K). One heavyweight at a time on
+that GPU. The full story is
+`gollama-wz/gollama/dev-docs/DABEEST-CLIENT.md`.
+
+`status` then carries one more line, and `start` ends with it:
+
+```text
+ok    agent endpoint — http://127.0.0.1:11434 (agent/config.json) —
+      http://127.0.0.1:11434/v1/models answered
+```
+
+Anthropic's own endpoint needs a key even to list models, so for that host the
+check only asks whether the host resolves; a 401 there is not a failure. An
+instance with no base URL anywhere adds no line at all.
+
+The supplier says what it resolved, once, at attach — never the key:
+
+```text
+[gyld] glade-gyld: agent base-url http://127.0.0.1:11434 model qwen3.8-96k
+       compat ollama (max_tokens 32768, max input 65536)
+```
+
+### What it looks like in the window
+
+Right-click a box, `Ask about this`, type a question, `Ask`. The turn draws as
+it always does — citations first, then the prose — with one addition: a
+**note** line for anything the call had to do differently. Against dabeest
+there is exactly one, every turn:
+
+```text
+the ollama endpoint has no /v1/messages/count_tokens, so this turn's input
+budget is an ESTIMATE of about 1778 tokens (one per 3 characters of request),
+not a count
+```
+
+That is the guide's own fact — there is no `count_tokens` there — and the
+budget is still checked, against an estimate that says it is one. `strict` on
+the draft tool and both `cache_control` breakpoints are ACCEPTED by that
+server, so neither is dropped and a `propose_draft` call comes back validated:
+a local model makes the same offer, with `drafted_by: qwen3.8-96k` on it, and
+`Take this draft` works exactly as before. An endpoint that rejected either
+would have the supplier retry without it and say so on the same note stream.
+
+Budgets are smaller here and deliberately so. `max_tokens` defaults to 32768
+rather than 64000 because these are thinking models and thought tokens come out
+of that budget — too small a cap returns empty content with the answer never
+emitted — and the input budget defaults to 65536, which is what is left of
+qwen's 98,304-token window once the output is reserved.
+
 ## What a run looked like
 
 ```
