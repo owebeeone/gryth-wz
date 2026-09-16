@@ -1,6 +1,18 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a0a9e0-50dc-77fe-9152-7df9a88ad07a
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+origin_url_hash: sha256:49393e54f57a138f597cba88d3363cf1d11458f0311b8fba9419c18196be9922
+created_at: unix-ms:1789556445411
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 40ef42244660e74bbdfc60458ef9a7040d42e2f8
+  branch: main
+selected_targets:
+- '@root'
+committed_targets:
+- '@root'
 members:
   mem_glade_decl_ts:
     path: glade-decl-ts
