@@ -231,7 +231,12 @@ forces it), and no vite runs at all.
 
 ## 4. Drive it
 
-Open `+ Gyld streams` from the launcher. The desk is already on the glade node:
+The launcher's Gyld windows are named plainly — `Graph`, `Streams`, `Details`,
+`Next up` — with decide, compare and diff keeping the names they had
+(`dev-docs/ui/GyldUiSimplification.md` 2.3, owner ruling U5 of 2026-09-16). The
+tool ids behind them are unchanged, so a stored desk still resolves.
+
+Open `+ Streams` from the launcher. The desk is already on the glade node:
 an empty desk adds that root itself on the edge into `live`, so the census is
 there with nothing pressed and there is no picker to get past
 (`gryth-ui/packages/plugins/gyld/README.md`, "What an empty desk lands on").
@@ -252,18 +257,27 @@ there with nothing pressed and there is no picker to get past
    and `Submit` sends the same two operands as the `fork` verb. The run streams
    the host's own record of what it wrote and closes `end, exit 0`. `Rebuild`
    again and the tree says `6 streams`.
-4. **Draw it.** Open `+ Gyld browser`, choose stream `demo-keys` and
+4. **Draw it.** Open `+ Graph`, choose stream `demo-keys` and
    perspective `decisions`. The picture draws from a lens pointer fetched over
-   the proxy with its sha256 checked.
-5. **Answer.** Press `Decide`. It composes on a GLADE root: the supplier
-   publishes each stream's `projection.json` and `validation.json` on
-   `gyld.file` as pointers beside the lens pointers, so the classes an overlay
-   names are read the same way the picture is. The static-root detour this step
-   used to require is gone.
+   the proxy with its sha256 checked. The chrome says how many boxes this
+   stream lists as answerable now, those boxes are drawn bright, and every
+   `Open` and `Lean` question carries a glyph inside its own box;
+   `Next up only` dims the rest and says in the omission strip how many it
+   dimmed.
+5. **Answer.** Hover the question's own box: the card over it carries the
+   question's text, its alternatives with any recorded lean marked, and
+   `Answer`, which moves this window onto that question and opens the decide
+   window already on it. (`Decide` in the chrome still opens the same window
+   on whatever the browser has focused.) The decide window composes on a GLADE
+   root: the supplier publishes each stream's `projection.json` and
+   `validation.json` on `gyld.file` as pointers beside the lens pointers, so
+   the classes an overlay names are read the same way the picture is. The
+   static-root detour this step used to require is gone.
 
-   Choose the question, an alternative, a principal, a stamp and the
-   ruling text. `Export overlay` puts the module in the box and `Submit answer`
-   sends that very text. The composed module carries the stream's
+   The question is already chosen: the answer form defaults to the record the
+   browser is on, which is the one the card just moved it to. Choose an
+   alternative, a principal, a stamp and the ruling text. `Export overlay` puts
+   the module in the box and `Submit answer` sends that very text. The composed module carries the stream's
    `gyld-stream-record:` block, and for a FORK it declares `follows: base` and
    `imports: glade_decisions`, which is what the module actually imports and
    what its root subclasses.
@@ -272,13 +286,15 @@ there with nothing pressed and there is no picker to get past
    stream's records, and `Submit answer` is refused there, naming the module
    and the six records it already declares. That is the guard under "One
    answer per stream" below doing its job, and the way past it is the flow
-   that guard names: make the stream this ruling belongs to. In
-   `+ Gyld streams` choose `Link`, parent `demo-keys`, name
-   `demo-keys-ruling`, `Submit`, `Rebuild`; press `Decide` on the new
-   stream. Its module declares nothing but its
+   that guard names: make the stream this ruling belongs to. The card says so
+   BEFORE the refusal — its button reads `Answer (needs its own stream)` and
+   `Link a stream for this ruling` beside it opens `Streams` with `Link`,
+   parent `demo-keys` and a name for this ruling already filled in. Press it,
+   `Submit`, `Rebuild`; then hover that question again on the new
+   stream and press `Answer`. Its module declares nothing but its
    own root class, which the composed module declares again, so `Submit
    answer` is live: the run streams `end, exit 0`, the supplier writes the
-   module and rebuilds, and in the new build `demo-keys-ruling` validates
+   module and rebuilds, and in the new build `demo-keys-key_custody` validates
    `ok` with `key_custody` reading `Decided`.
 6. **Diff.** Open `+ Gyld diff`, choose left `base` and right `demo-keys`. An
    emitted diff is the one bundle file still on no share, so add the build as a

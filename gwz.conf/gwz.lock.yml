@@ -42,7 +42,7 @@ members:
     path: gryth-ui
     source_id: src_gryth_ui
     source_kind: git
-    commit: e48b90eccf8a00deac71001d11fd10161226b1a9
+    commit: 4027d0b8c752444f3fd2c5510108ca22401f6980
     branch: glp-0006-p1s4-gryth-panels
     detached: false
     dirty: false
