@@ -1,6 +1,18 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a0ba17-7372-79a7-b40b-e972138795d3
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+origin_url_hash: sha256:49393e54f57a138f597cba88d3363cf1d11458f0311b8fba9419c18196be9922
+created_at: unix-ms:1789828494202
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 2e4681b8444e7bb04d880e59c9ea7823ef4caa49
+  branch: main
+selected_targets:
+- '@root'
+committed_targets:
+- '@root'
 members:
   mem_glade_decl_ts:
     path: glade-decl-ts
@@ -42,7 +54,7 @@ members:
     path: gryth-ui
     source_id: src_gryth_ui
     source_kind: git
-    commit: 73f9e707b4217d856f07c57c2299e8aae4932b8c
+    commit: 4800f71dfaebbef348b6e80250cfd6abba22f0a1
     branch: glp-0006-p1s4-gryth-panels
     detached: false
     dirty: false
