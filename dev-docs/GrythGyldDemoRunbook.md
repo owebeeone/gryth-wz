@@ -26,7 +26,7 @@ and step 4 can begin straight away: the desk lands on the glade node by itself,
 and **`List` is accepted the first time it is pressed**, because the supplier
 gave the bundle root its first build before the script printed that URL. The
 script waits for the supplier's `published builds/… (N streams)` line and prints
-`first build running (run boot-1)` with the elapsed time while it waits.
+`first build running (run boot-<session>)` with the elapsed time while it waits.
 
 ```sh
 python3 gyld-ui.py status                # ok/FAIL per check, then working / not working
@@ -127,11 +127,11 @@ the first build** (`glade-wz/glade-gyld/README.md`, "The first build is the
 supplier's own"): the moment it is serving it reads the bundle root, and
 
 - **on an empty root** — a fresh `--data` — it lays the stage and runs the first
-  build itself as run `boot-1`, while it goes on serving. Four of its lines say
+  build itself as run `boot-<session>`, while it goes on serving. Four of its lines say
   so, in this order:
 
   ```
-  [gyld] glade-gyld: first build of .../files/gyld — the bundle root holds none (run boot-1)
+  [gyld] glade-gyld: first build of .../files/gyld — the bundle root holds none (run boot-<session>)
   [gyld] glade-gyld: serving; SIGTERM/SIGINT to stop
   [gyld] glade-gyld: the checkout declares fork-a, stream-a, stream-b
   [gyld] glade-gyld: published builds/build-1789366082551 (5 streams)
@@ -150,7 +150,7 @@ Until that publication lands, a verb that needs a bundle is refused with the run
 rather than with a flat denial:
 
 ```
-the first build is in progress (run boot-1); nothing has landed yet
+the first build is in progress (run boot-<session>); nothing has landed yet
 ```
 
 `fork` and `link` are unaffected throughout: they write an overlay module rather
@@ -158,7 +158,7 @@ than a bundle and never needed one.
 
 The `published` line is the census reaching the value shares, which is what a
 desk reads. `gyld-ui.py start` waits for it — printing `first build running (run
-boot-1)` with the elapsed time meanwhile — and does not start the dev server or
+boot-<session>)` with the elapsed time meanwhile — and does not start the dev server or
 print the URL until it is there. So a page opened at that URL never lands on a
 root with nothing in it. `status` checks the same thing twice over: that
 `latest.json` names a build, and that the log carries the supplier's publication
@@ -244,7 +244,7 @@ there with nothing pressed and there is no picker to get past
 
 1. **List.** `list: accepted, exit 0, run run-1`, with the build's whole
    `streams.json` in the panel. It runs no host. On a root whose first build is
-   still in flight it answers `the first build is in progress (run boot-1)`
+   still in flight it answers `the first build is in progress (run boot-<session>)`
    instead, and `gyld-ui.py start` has already waited that out.
 2. **Rebuild.** A streaming run: the answer is `rebuild: accepted, run run-2`
    and the run's lines arrive on `gyld.output` keyed by that run, ending

@@ -1,0 +1,61 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a0c25a-580e-76ae-8dd9-b65041107f86
+workspace_id: ws_default
+origin_url_hash: sha256:49393e54f57a138f597cba88d3363cf1d11458f0311b8fba9419c18196be9922
+created_at: unix-ms:1789967095830
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 9e6bf4744c1a2ffbf78bd9db12e710faa404b5ea
+  branch: main
+selected_targets:
+- '@root'
+committed_targets:
+- '@root'
+members:
+  mem_glade_decl_ts:
+    path: glade-decl-ts
+    source_id: src_glade_decl_ts
+    source_kind: git
+    commit: 7e16e324630a4518b024ba9cfd95935a00db2892
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_glial:
+    path: glial
+    source_id: src_glial
+    source_kind: git
+    commit: 0dfe4b930063bb1b04c126c2b020e494290aa631
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_grip_core:
+    path: grip-core
+    source_id: src_grip_core
+    source_kind: git
+    commit: 97ff6c26f12e2808cd794d2947a852d7c16e4e22
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_grip_react:
+    path: grip-react
+    source_id: src_grip_react
+    source_kind: git
+    commit: c13b8a75e88e33cd8dcaf5222a06c76d4370d010
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gryth_ui:
+    path: gryth-ui
+    source_id: src_gryth_ui
+    source_kind: git
+    commit: e6fc4afc316106da5eab044098037ede6d4a79b6
+    branch: glp-0006-p1s4-gryth-panels
+    detached: false
+    dirty: false
+    materialized: true
