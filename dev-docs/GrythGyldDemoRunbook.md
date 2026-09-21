@@ -131,7 +131,7 @@ supplier's own"): the moment it is serving it reads the bundle root, and
   so, in this order:
 
   ```
-  [gyld] glade-gyld: first build of .../files/gyld — the bundle root holds none (run boot-<session>)
+  [gyld] glade-gyld: first build of .../files/gyld — the bundle root holds none (run boot-mu0ud3ep)
   [gyld] glade-gyld: serving; SIGTERM/SIGINT to stop
   [gyld] glade-gyld: the checkout declares fork-a, stream-a, stream-b
   [gyld] glade-gyld: published builds/build-1789366082551 (5 streams)
@@ -150,7 +150,7 @@ Until that publication lands, a verb that needs a bundle is refused with the run
 rather than with a flat denial:
 
 ```
-the first build is in progress (run boot-<session>); nothing has landed yet
+the first build is in progress (run boot-mu0ud3ep); nothing has landed yet
 ```
 
 `fork` and `link` are unaffected throughout: they write an overlay module rather
