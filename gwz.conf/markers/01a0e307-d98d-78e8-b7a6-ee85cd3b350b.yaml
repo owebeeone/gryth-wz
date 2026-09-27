@@ -1,0 +1,115 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a0e307-d98d-78e8-b7a6-ee85cd3b350b
+workspace_id: ws_default
+created_at: '1790515336885'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 90c154001973e668848e01622aa6ab3ee43d8028
+  branch: main
+selected_targets:
+- mem_gryth_ui
+- mem_grip_core
+- mem_grip_react
+- mem_glade_decl_ts
+- mem_glial
+- '@root'
+committed_targets:
+- mem_gryth_ui
+- '@root'
+members:
+  mem_glade_decl_ts:
+    path: glade-decl-ts
+    source_id: src_glade_decl_ts
+    source_kind: git
+    commit: 37d9b7d8a680b2e0007ede55304881d6331d6969
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_glial:
+    path: glial
+    source_id: src_glial
+    source_kind: git
+    commit: 4c6e8561c1740de78b7634d9205a521183919d83
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_grip_core:
+    path: grip-core
+    source_id: src_grip_core
+    source_kind: git
+    commit: 97ff6c26f12e2808cd794d2947a852d7c16e4e22
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_grip_react:
+    path: grip-react
+    source_id: src_grip_react
+    source_kind: git
+    commit: c13b8a75e88e33cd8dcaf5222a06c76d4370d010
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gryth_ui:
+    path: gryth-ui
+    source_id: src_gryth_ui
+    source_kind: git
+    commit: 5a8d1236a6651752720418d986b9c23504c2a642
+    branch: glp-0006-p1s4-gryth-panels
+    detached: false
+    dirty: false
+    materialized: true
+merge:
+  merge_id: merge_op_30160_1790515336692_0001
+  operation_id: op_30160_1790515336692
+  source_ref: refs/gwz/local-imports/xfer_002538459b18f347ad8837b4a1d1e836
+  selected_targets:
+  - mem_gryth_ui
+  - mem_grip_core
+  - mem_grip_react
+  - mem_glade_decl_ts
+  - mem_glial
+  - '@root'
+  participants:
+    '@root':
+      target_kind: root
+      target_branch: main
+      before_commit: 3c64e7a59064f6d411679c47a9aaf857c19d4258
+      source_commit: 90c154001973e668848e01622aa6ab3ee43d8028
+      resulting_commit: 90c154001973e668848e01622aa6ab3ee43d8028
+    mem_glade_decl_ts:
+      target_kind: member
+      target_branch: main
+      before_commit: 37d9b7d8a680b2e0007ede55304881d6331d6969
+      source_commit: 37d9b7d8a680b2e0007ede55304881d6331d6969
+      resulting_commit: 37d9b7d8a680b2e0007ede55304881d6331d6969
+    mem_glial:
+      target_kind: member
+      target_branch: main
+      before_commit: 4c6e8561c1740de78b7634d9205a521183919d83
+      source_commit: 4c6e8561c1740de78b7634d9205a521183919d83
+      resulting_commit: 4c6e8561c1740de78b7634d9205a521183919d83
+    mem_grip_core:
+      target_kind: member
+      target_branch: main
+      before_commit: 97ff6c26f12e2808cd794d2947a852d7c16e4e22
+      source_commit: 97ff6c26f12e2808cd794d2947a852d7c16e4e22
+      resulting_commit: 97ff6c26f12e2808cd794d2947a852d7c16e4e22
+    mem_grip_react:
+      target_kind: member
+      target_branch: main
+      before_commit: c13b8a75e88e33cd8dcaf5222a06c76d4370d010
+      source_commit: c13b8a75e88e33cd8dcaf5222a06c76d4370d010
+      resulting_commit: c13b8a75e88e33cd8dcaf5222a06c76d4370d010
+    mem_gryth_ui:
+      target_kind: member
+      target_branch: glp-0006-p1s4-gryth-panels
+      before_commit: 9323818a39d2c363f82af4a27d6eb1faf36a813e
+      source_commit: 5a8d1236a6651752720418d986b9c23504c2a642
+      resulting_commit: 5a8d1236a6651752720418d986b9c23504c2a642
+  root_merge_commit: 90c154001973e668848e01622aa6ab3ee43d8028
