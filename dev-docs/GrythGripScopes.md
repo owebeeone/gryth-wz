@@ -2,8 +2,8 @@
 
 Date: 2026-10-02
 Status: **design, ruled** (owner, 2026-10-02: "yes to all", §3.4) — the scope of
-every grip the desk defines, for the owner's two-node settings demo. Nothing here
-is built.
+every grip the desk defines, for the owner's two-node settings demo. The inventory
+below preserves its original source snapshot; implementation status is in §4.
 Source: `gryth-wz` main at `afa5766`, with gryth-ui as locked there; read only.
 Method: every `defineGrip` call was read with its comment, and a tap only where it
 decides what holds a value. No build, test or server was run.
@@ -422,3 +422,14 @@ must give way to real providers.
 
 **Ruled, owner, 2026-10-02 ("yes to all"):** every recommendation above, 1 to 8.
 The tie-break of question 8 was fixed first, in glade `c1a6764`.
+
+## 4. Implementation, 2026-10-02
+
+The accepted session/appearance split is implemented in the `appearance` lane.
+See [GladeSettingsSessionPlan.md](GladeSettingsSessionPlan.md) for the contract,
+boundaries, regression tests and verification. Named Gyld sessions use one
+`gyld.desk` value; live link fields bridge tab records and their existing grip
+contexts in both directions. Gyld roots/focus and Code WTA remain doc-promotable.
+The reveal cue is page-local. Promotion UX and the full desktop's roaming remain
+deferred. The original inventory's “Today” column describes the recorded source
+commit, rather than the implemented tree.

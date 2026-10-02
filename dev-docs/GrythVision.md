@@ -14,24 +14,28 @@ data; each participant's UI is a durable **desktop** — windows over those
 surfaces — that persists and roams across their instances; and humans and AI
 agents are peers distinguished only by capability and attribution.
 
-## The google-docs model (three tiers)
+## Scope model (four tiers, GDL-030 refinement)
 
 - **doc scope** — the shared artifact: workspace state, terminals, chat,
-  VM inventory, the activity graph. Durable, multi-writer, attributed.
-- **environ scope** — the user's desktop: window layout, focus, selections,
-  filters. Durable, owned by one user, replicated across all instances of
-  that user's environ (laptop, desktop, second browser), and delegable —
-  this is the scope an agent writes to drive the UI.
-- **instance scope** — one running client: viewport, drag-in-progress,
-  transient hover/menu state. Ephemeral, never replicated.
+  VM inventory and the activity graph. Durable, multi-writer, attributed.
+- **environ scope** — the user's appearance: theme, wallpaper, UI zoom and
+  font scale. It MUST roam across that principal's sessions.
+- **session scope** — one named desk: windows, geometry, z-order, tab links,
+  current desktop and serializable plugin inputs. Pages selecting the same
+  entry, principal and session MUST mirror it. Different sessions MAY show
+  independent desks over the same sources.
+- **instance scope** — one running page: keyboard focus, reveal cues, cameras,
+  drafts, hover and gestures. It MUST NOT replicate.
 
-What earlier drafts called "session scope" was conflating the last two; the
-desktop model splits them. The grip-lab inventory confirms the split is real:
-`Lab.CurrentView` is environ, `Lab.ChatComposerDrag` is instance.
+Owner ruling, 2026-10-02: all eight recommendations in
+[GrythGripScopes.md](GrythGripScopes.md) §3.4 were accepted. The implementation
+contract and evidence are in [GladeSettingsSessionPlan.md](GladeSettingsSessionPlan.md).
+Gyld set roots and semantic focus live in session scope and remain eligible
+for later promotion into a team document. Promotion and delegation UX remain
+separate work.
 
-North star: an agent holding an environ capability can drive a user's UI —
-"open the debugger for me" is a capability grant plus a write to a declared
-environ surface, not a feature.
+North star: an agent holding a session capability can drive a user's desk —
+"open the debugger for me" becomes a write to a declared session surface.
 
 ## Three commitments
 
@@ -46,7 +50,7 @@ Consequence: a button in the UI and an MCP agent invoke the **same declared
 exchange** with the same capability check. "1-click VM" and "an agent can do
 it" are one feature, not two.
 
-### C2 — The UI is a desktop, not tabs (environ scope)
+### C2 — The UI is a desktop, not tabs (session scope)
 
 The shell is a window manager in the macOS/Windows/GNOME/KDE sense. Each
 window is an individual view instance — a chat, a vm-manager, a workspace
@@ -54,11 +58,11 @@ view, a terminal — and the same kind can be open more than once. Windows
 float, stack, tile side-by-side, minimize, and carry z-order; tiling/splits
 can live inside a window where a view wants panes.
 
-The desktop itself is data: an environ-scoped document (windows, geometry,
-z-order, focus, per-window facet binding to a source handle) that persists
-and replicates across all instances of the user's environ. Stacking
-terminals, side-by-side diffs, and mix-and-match views are properties of
-this, not features.
+The desktop itself is data: a session document holding windows, geometry,
+z-order, current desktop and per-tab destination bindings. Keyboard focus
+stays on each page. The first implementation MUST use one whole-document
+LWW value with a 300 ms debounce; concurrent edits MAY overwrite unrelated
+moves. A measured lost move is the trigger to revisit per-window values.
 
 Because the desktop is data it is: shareable (the `stateUrl.ts`
 generalization), followable (presenter mode), and AI-drivable (a delegated
@@ -100,7 +104,7 @@ Grip has three tap classes, and they decide what persistence exists at all:
 
 Consequences:
 
-- **Only class 1 needs persisting on the client.** The environ document is
+- **Only class 1 needs persisting on the client.** The session document is
   precisely the *serializable* class-1 atom map — `stateUrl.ts` made
   general. The non-serializable class-1 grips (tap handles, function grips)
   are runtime wiring: rebuilt on boot, never persisted. Sharing a session
@@ -131,7 +135,7 @@ independently.
 | 3 | VM manager — new VM workspace in 1 click, or an agent can | C1 + C3 | VmMgrDataModel entities as surfaces; rebase/create as exchanges |
 | 4 | Agents identified "on behalf of" via MCP endpoints | C3 | delegation + attribution in the envelope (GDL-004) |
 | 5 | Terminals stack and drag around | C2 | tiles in stack containers |
-| 6 | Desktop / window manager — windows as view instances; environ persists and roams across the user's instances | C2 | environ scope; window lifecycle ≠ source lifecycle |
+| 6 | Desktop / window manager — windows as view instances; session persists and mirrors across its pages | C2 | session scope; window lifecycle ≠ source lifecycle |
 | 7 | Diffs pulled side by side | C2 | two diff windows/tiles in a row; diff endpoints are declared inputs |
 | 8 | Tabs too rigid — mix and match | C2 | desktop-as-data kills fixed views at the model level |
 
@@ -139,7 +143,7 @@ independently.
 
 - `grip-lab/src/lab/grips.ts` — proof the UI state can be 100% data
   (enforced by the no-react-state test). The inventory splits cleanly into
-  doc / environ / instance / promotable-middle.
+  doc / environ / session / instance / promotable-middle.
 - `grip-lab/src/lab/stateUrl.ts` — a view as a grip→value map; the embryo of
   layout-as-data and shared focus. Its six keys are the empirically
   discovered promotable set.
@@ -173,19 +177,14 @@ independently.
 ## Open questions (flesh-out list)
 
 - Desktop document schema: windows, geometry, z-order, stacks/splits, facet
-  bindings, focus — needs the same declaration rigor as protocol surfaces.
+  bindings, semantic focus — needs the same declaration rigor as protocol surfaces.
   Per-window context params (cf. `Lab.View.*` destination params) are the
   Grip-model refinement candidate.
-- Mirrored vs independent: do two live instances of one environ render the
-  same desktop (move a window here, it moves there), or separate desktops
-  over shared content (virtual desktops / KDE activities per environ)?
-  Likely both, via a per-instance "current desktop" pointer.
-- Concurrent instances: conflict semantics when two clients edit the desktop
-  at once — per-window geometry as LWW atoms is probably enough; focus may
-  need to be per-instance.
+- Per-window merge policy remains deferred until concurrent desk use reveals
+  lost moves; the current session contract is whole-document LWW.
 - Promotion semantics: my selection → shared focus; follow/presenter mode;
-  which environ surfaces are promotable by default.
-- Delegation UX: how a human grants/revokes an agent's environ capability;
+  which session surfaces are promotable by default.
+- Delegation UX: how a human grants/revokes an agent's session capability;
   how "on behalf of" renders in chat, history, and the activity graph.
 - Chat scope: message log vs intent trail — how far do surface links,
   AI findings, and exchange receipts go into chat?
@@ -196,8 +195,8 @@ independently.
 
 ## First slice (sketch only — prune before building)
 
-Minimal desktop shell (window mechanics + environ-scope desktop grips,
+Minimal desktop shell (window mechanics + session-scope desktop grips,
 mock-persisted) hosting three windows over mock taps: chat, one terminal,
 one diff. Then one real surface (terminal) behind the seam, and desktop
 persistence/roaming behind the same seam. Proves C2 end-to-end, C1 on one
-surface, and the environ-scope delegation path an agent would use.
+surface, and the session-scope delegation path an agent would use.
